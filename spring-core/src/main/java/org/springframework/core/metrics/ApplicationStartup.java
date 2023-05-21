@@ -34,11 +34,17 @@ public interface ApplicationStartup {
 	ApplicationStartup DEFAULT = new DefaultApplicationStartup();
 
 	/**
+	 * 创建新步骤并标记其开始
+	 * 步骤名称描述当前操作或阶段
+	 *
+	 * 名称应为 "." 命名空间，并且可以重用以描述的其他实例
+	 * 应用程序启动过程中的相同步骤
+	 *
 	 * Create a new step and marks its beginning.
 	 * <p>A step name describes the current action or phase. This technical
 	 * name should be "." namespaced and can be reused to describe other instances of
 	 * the same step during application startup.
-	 * @param name the step name
+	 * @param name the step name 步骤名称
 	 */
 	StartupStep start(String name);
 
