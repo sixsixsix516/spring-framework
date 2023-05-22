@@ -1012,6 +1012,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
+				// 如果不允许覆盖定义，就直接抛出异常
 				throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
 			}
 			else if (existingDefinition.getRole() < beanDefinition.getRole()) {
@@ -1036,11 +1037,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							"] with [" + beanDefinition + "]");
 				}
 			}
+			
+			// 覆盖定义
 			this.beanDefinitionMap.put(beanName, beanDefinition);
 		}
 		else {
+			// 第一次注册该 beanName
+			
 			if (isAlias(beanName)) {
+				// 是一个别名
+				
 				if (!isAllowBeanDefinitionOverriding()) {
+					// 不允许覆盖定义，直接抛出异常
 					String aliasedName = canonicalName(beanName);
 					if (containsBeanDefinition(aliasedName)) {  // alias for existing bean definition
 						throw new BeanDefinitionOverrideException(
@@ -1053,25 +1061,38 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
+					// 删除别名
 					removeAlias(beanName);
 				}
 			}
 			if (hasBeanCreationStarted()) {
+				// 工厂的 bean 创建阶段已经启动
+				
+				// 存在并发风险，同步放入
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
+					// 注册 bean
 					this.beanDefinitionMap.put(beanName, beanDefinition);
+					
+					// 更新 beanDefinitionNames 列表：加入当前的 bean name
 					List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
 					updatedDefinitions.addAll(this.beanDefinitionNames);
 					updatedDefinitions.add(beanName);
 					this.beanDefinitionNames = updatedDefinitions;
+					
+					// 删除掉 manualSingletonNames 中的 当前 beanName
 					removeManualSingletonName(beanName);
 				}
 			}
 			else {
+				// 工厂的 bean 创建阶段没启动
+				
+				// 没启动，不存在并发风险,直接放进去
 				// Still in startup registration phase
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				this.beanDefinitionNames.add(beanName);
 				removeManualSingletonName(beanName);
+				
 			}
 			this.frozenBeanDefinitionNames = null;
 		}

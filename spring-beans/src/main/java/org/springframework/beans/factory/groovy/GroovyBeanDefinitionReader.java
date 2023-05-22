@@ -237,6 +237,7 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
 	public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
+		// 如果传进来理论 xml 文件，就转给 XmlBeanDefinitionReader 处理
 		// Check for XML files and redirect them to the "standard" XmlBeanDefinitionReader
 		String filename = encodedResource.getResource().getFilename();
 		if (StringUtils.endsWithIgnoreCase(filename, ".xml")) {
@@ -539,6 +540,7 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 		GroovyBeanDefinitionWrapper beanDefinition = this.currentBeanDefinition;
 		this.currentBeanDefinition = null;
 		beanDefinition.getBeanDefinition().setAttribute(GroovyBeanDefinitionWrapper.class.getName(), beanDefinition);
+		// 注册 bean definition
 		getRegistry().registerBeanDefinition(beanName, beanDefinition.getBeanDefinition());
 		return beanDefinition;
 	}

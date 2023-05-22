@@ -61,6 +61,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
     private AnnotatedElement qualifiedElement;
     
     /**
+     * 确定 是否需要 重新合并定义
      * Determines if the definition needs to be re-merged.
      */
     volatile boolean stale;
